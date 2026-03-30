@@ -21,7 +21,7 @@ ollama pull llama3.2
 
 ### 2. Clone o repositório
 ```bash
-git clone https://github.com/seu-usuario/starter-english-teacher-agent.git
+git clone https://github.com/AThomasA/starter-english-teacher-agent.git
 cd starter-english-teacher-agent/agent-test
 ```
 
