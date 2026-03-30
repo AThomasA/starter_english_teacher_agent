@@ -1,0 +1,23 @@
+# Python-generated files
+__pycache__/
+*.pyc
+*.pyo
+build/
+dist/
+wheels/
+*.egg-info
+
+# Ambiente virtual
+.venv/
+
+# Variáveis de ambiente
+.env
+
+# Banco vetorial (gerado localmente)
+chroma_db/
+
+# PDFs dos livros (direitos autorais)
+data/
+
+# Streamlit
+.streamlit/secrets.toml
