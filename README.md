@@ -60,4 +60,7 @@ agent-test/
 ## 🏫 Sobre a SOS English
 
 Projeto desenvolvido como portfólio técnico e demonstração do uso de IA  
-aplicada ao ensino de inglês online da [SOS English](#).
+aplicada ao ensino de inglês online da [SOS English](https://instagram.com/sabino.onlineschool).
+
+Caso queira acesso ao PDF utilizado para testar o modelo, entre em contato pelo Instagram.  
+E se você quiser aulas de inglês online para aprender a se comunicar de verdade, conversa com a gente por lá que vamos definir o melhor horário para você.
