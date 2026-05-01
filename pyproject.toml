@@ -8,6 +8,7 @@ dependencies = [
     "chromadb>=1.5.5",
     "langchain>=1.2.13",
     "langchain-community>=0.4.1",
+    "langchain-groq>=1.1.2",
     "ollama>=0.6.1",
     "pdf2image>=1.17.0",
     "pillow>=12.1.1",

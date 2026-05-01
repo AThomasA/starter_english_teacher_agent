@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_community.llms import Ollama
+from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -11,7 +11,8 @@ load_dotenv()
 
 COLLECTION_NAME = os.getenv("COLLECTION_NAME", "sos_english")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.2-90b-text-preview")
 CHROMA_DIR = "chroma_db"
 
 SYSTEM_PROMPT = """You are Bi, an English teacher at SOS English online school.
@@ -66,7 +67,11 @@ def format_docs(docs):
 def create_agent():
     vectorstore = load_vectorstore()
     retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
-    llm = Ollama(model=OLLAMA_MODEL, temperature=0.7)
+    llm = ChatGroq(
+        api_key=GROQ_API_KEY,
+        model=GROQ_MODEL,
+        temperature=0.7,
+    )
 
     chain = (
         {
