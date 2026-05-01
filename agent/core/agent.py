@@ -8,12 +8,13 @@ import time
 import uuid
 from typing import Tuple
 from dotenv import load_dotenv
+from pathlib import Path
 
 from agent.models.model_config import get_llm_client, get_active_model_config
 from agent.tools.obsidian_writer import load_bianca_context
 from agent.tools.token_tracker import TokenTracker, MessageMetrics
 
-load_dotenv()
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
 
 # ============================================================
 # PERSONALIDADE DA BIANCA

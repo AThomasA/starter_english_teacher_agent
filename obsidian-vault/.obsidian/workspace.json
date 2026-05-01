@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "05-session-memory/vocabulary-learned.md",
+                "file": "05-session-reports/progress/2026-05-01_5a609ce2_progress.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "vocabulary-learned"
+              "title": "2026-05-01_5a609ce2_progress"
             }
           }
         ]
@@ -183,6 +183,12 @@
   },
   "active": "5bcea104145e58fd",
   "lastOpenFiles": [
+    "05-session-reports/costs/2026-05-01_5a609ce2_cost.md",
+    "05-session-memory/vocabulary-learned.md",
+    "05-session-reports/progress/2026-05-01_5a609ce2_progress.md",
+    "05-session-reports/progress",
+    "05-session-reports/costs",
+    "05-session-reports",
     "05-session-memory/error-patterns.md",
     "05-session-memory/student-profile.md",
     "03-teaching-metrics/progress-tracking.md",
@@ -194,7 +200,6 @@
     "00-bianca-core/correction-techniques.md",
     "00-bianca-core/teaching-philosophy.md",
     "00-bianca-core/personality.md",
-    "05-session-memory/vocabulary-learned.md",
     "06-session-reports",
     "05-session-memory",
     "01-curriculum/overview.md",
@@ -203,7 +208,6 @@
     "03-teaching-metrics",
     "02-books",
     "01-curriculum",
-    "00-bianca-core",
     "Bem-vindo.md"
   ]
 }
