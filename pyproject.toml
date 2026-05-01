@@ -3,7 +3,7 @@ name = "starter-english-teacher-agent"
 version = "0.1.0"
 description = "Agente professor de inglês com RAG usando o livro Starter da SOS English"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.13"
 dependencies = [
     "chromadb>=1.5.5",
     "langchain>=1.2.13",
@@ -21,7 +21,6 @@ dependencies = [
     "groq>=0.5.0",
     "openai>=1.30.0",
     "anthropic>=0.34.0",
-    "google-generativeai>=0.11.0",
 ]
 
 [tool.uv]

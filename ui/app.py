@@ -117,6 +117,32 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"Erro ao salvar: {e}")
 
+    
+    # Base de Conhecimento
+    st.divider()
+
+    st.caption("📚 Base de Conhecimento")
+
+    selected_level = st.selectbox(
+    "Selecionar nível",
+    ["starter", "level-1", "level-2"],
+    key="rag_level"
+    )
+
+    if st.button("📥 Processar PDFs") and not st.session_state.get("processing", False):
+        st.session_state.processing = True
+
+        try:
+            from rag.rag_pipeline import run_ingestion
+
+            run_ingestion(level=selected_level)
+            
+            st.success(f"✅ PDFs processados para {selected_level}")
+        except Exception as e:
+            st.error(f"Erro: {e}")
+        finally:
+            st.session_state.processing = False
+
     # Botão para nova sessão
     if st.button("🔄 Nova Sessão", use_container_width=True):
         for key in ["agent", "messages_display", "session_saved"]:
