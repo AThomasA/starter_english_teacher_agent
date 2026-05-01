@@ -1,87 +1,154 @@
-from dotenv import load_dotenv
-from langchain_community.embeddings import SentenceTransformerEmbeddings
-from langchain_community.vectorstores import Chroma
-from langchain_groq import ChatGroq
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+# agent/core/agent.py
+# ============================================================
+# AGENTE PRINCIPAL — BIANCA, ENGLISH TEACHER
+# ============================================================
+
 import os
+import time
+import uuid
+from typing import Tuple
+from dotenv import load_dotenv
+
+from agent.models.model_config import get_llm_client, get_active_model_config
+from agent.tools.obsidian_writer import load_bianca_context
+from agent.tools.token_tracker import TokenTracker, MessageMetrics
 
 load_dotenv()
 
-COLLECTION_NAME = os.getenv("COLLECTION_NAME", "sos_english")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.2-90b-text-preview")
-CHROMA_DIR = "chroma_db"
+# ============================================================
+# PERSONALIDADE DA BIANCA
+# ============================================================
+# TODO: Quando a Bianca responder o questionário de personalidade,
+#       substitua o conteúdo de BIANCA_PERSONALITY pelo resultado refinado.
+#       Por enquanto, usamos este perfil base construído a partir da descrição
+#       do Allan como referência inicial.
 
-SYSTEM_PROMPT = """You are Bi, an English teacher at SOS English online school.
-You were trained on the Starter level book, which is the most basic level of the course.
+BIANCA_PERSONALITY = """
+You are Bianca, an English teacher at SOS English school in Brazil.
 
-Your personality:
-- You are friendly, fun, and relaxed - you talk to students like they are your best friends
-- You always bring explanations to the student's real life and daily routine
-- You use practical examples from everyday situations the student is familiar with
-- You correct mistakes gently and with humor, never making the student feel bad
-- You encourage students and make learning feel easy and natural
-- You are patient and always find a fun way to explain things
+YOUR PERSONALITY:
+- Warm, encouraging, and patient. Students feel safe to make mistakes with you.
+- You actively listen and adapt your teaching to what each student shares about their life.
+- You celebrate small wins genuinely. Never make students feel embarrassed about errors.
+- You're direct and practical — you don't waste time with abstract theory when a real example works better.
 
-Your rules:
-- Always respond in Portuguese (Brazilian), since most students are Brazilian beginners
-- Always show English examples clearly formatted, like: "In English: Hello, my name is Ana."
-- After the English example, explain it in Portuguese in a simple and fun way
-- Highlight key English words or phrases using quotes or bold when possible
-- Base your answers on the Starter book content when relevant
-- Keep answers clear, simple and encouraging
-- If you don't know something, be honest and suggest the student ask their teacher directly
+YOUR TEACHING APPROACH:
+- You ALWAYS bring English into the student's real daily life. If they like gaming, you use game examples. If they watch series, you use series dialogues. If they work in logistics, you use logistics vocabulary.
+- You ask about the student's hobbies, routines, and interests at the start and you weave them naturally into the lesson.
+- You believe in ACTIVE immersion: you don't just explain, you make the student USE the language immediately.
+- You use metrics to help students understand their own progress: you note patterns in their mistakes and point them out gently.
+- You give tips with movies, series, games, and podcasts — always aligned with what the student enjoys.
+- Corrections are gentle and embedded in your response naturally, not as a standalone criticism.
 
-Context from the book:
-{context}
+YOUR COMMUNICATION STYLE:
+- Speak in a mix of Portuguese and English depending on the student's level.
+  - Beginners: mostly Portuguese with English words introduced gradually.
+  - Intermediate: half and half, pushing them to respond more in English.
+  - Advanced: mostly English, with Portuguese only for complex grammar explanations.
+- Use informal, friendly language. You're a teacher, not a robot.
+- Keep responses focused. Don't overwhelm the student with too much at once.
+- Always end with an encouraging question or a small challenge to keep the student practicing.
 
-Chat history:
-{chat_history}
+IMPORTANT RULES:
+- NEVER give generic answers. Always personalize based on what you know about the student.
+- NEVER correct every single mistake at once — choose the most important one per message.
+- ALWAYS encourage the student to try speaking/writing in English, even if imperfect.
+- If a student seems discouraged, acknowledge the feeling first before teaching.
+"""
 
-Student: {question}
-Bi:"""
+# ============================================================
+# CLASSE DO AGENTE
+# ============================================================
 
-prompt = PromptTemplate(
-    input_variables=["context", "chat_history", "question"],
-    template=SYSTEM_PROMPT,
-)
+class BiancaAgent:
+    """
+    Agente da Bianca. Mantém o histórico de conversa da sessão
+    e centraliza as chamadas ao LLM.
+    """
 
+    def __init__(self):
+        self.session_id = str(uuid.uuid4())[:8]
+        self.tracker = TokenTracker()
+        self.conversation_history = []  # lista de {"role": ..., "content": ...}
+        self.model_config = get_active_model_config()
 
-def load_vectorstore():
-    embeddings = SentenceTransformerEmbeddings(model_name=EMBEDDING_MODEL)
-    vectorstore = Chroma(
-        collection_name=COLLECTION_NAME,
-        embedding_function=embeddings,
-        persist_directory=CHROMA_DIR,
-    )
-    return vectorstore
+        # Carrega contexto do vault Obsidian (se houver arquivos lá)
+        vault_context = load_bianca_context()
+        self.system_prompt = BIANCA_PERSONALITY
+        if vault_context:
+            self.system_prompt += (
+                "\n\n===\nADDITIONAL KNOWLEDGE FROM VAULT:\n" + vault_context
+            )
 
+    def chat(self, user_message: str) -> Tuple[str, MessageMetrics]:
+        """
+        Envia uma mensagem para o agente e retorna (resposta, métricas).
+        """
+        self.conversation_history.append({
+            "role": "user",
+            "content": user_message,
+        })
 
-def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)
+        client, model_id, provider = get_llm_client()
 
+        start_time = time.time()
+        response_text, input_tokens, output_tokens = self._call_llm(
+            client, model_id, provider
+        )
+        elapsed = time.time() - start_time
 
-def create_agent():
-    vectorstore = load_vectorstore()
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
-    llm = ChatGroq(
-        api_key=GROQ_API_KEY,
-        model=GROQ_MODEL,
-        temperature=0.7,
-    )
+        self.conversation_history.append({
+            "role": "assistant",
+            "content": response_text,
+        })
 
-    chain = (
-        {
-            "context": (lambda x: x["question"]) | retriever | format_docs,
-            "chat_history": lambda x: x.get("chat_history", ""),
-            "question": lambda x: x["question"],
-        }
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
+        metrics = self.tracker.record(
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            response_time_seconds=elapsed,
+        )
 
-    return chain
+        return response_text, metrics
+
+    def _call_llm(self, client, model_id: str, provider: str):
+        """
+        Chamada ao LLM de acordo com o provider ativo.
+        Retorna: (response_text, input_tokens, output_tokens)
+        """
+        max_tokens = int(os.getenv("MAX_TOKENS", 2000))
+        temperature = float(os.getenv("TEMPERATURE", 0.7))
+
+        # --- GROQ ou OPENAI (mesma interface OpenAI-compatible) ---
+        if provider in ("groq", "openai"):
+            messages = [{"role": "system", "content": self.system_prompt}]
+            messages += self.conversation_history
+
+            response = client.chat.completions.create(
+                model=model_id,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+            text = response.choices[0].message.content
+            input_tok  = response.usage.prompt_tokens
+            output_tok = response.usage.completion_tokens
+            return text, input_tok, output_tok
+
+        # --- ANTHROPIC ---
+        elif provider == "anthropic":
+            response = client.messages.create(
+                model=model_id,
+                system=self.system_prompt,
+                messages=self.conversation_history,
+                max_tokens=max_tokens,
+            )
+            text = response.content[0].text
+            input_tok  = response.usage.input_tokens
+            output_tok = response.usage.output_tokens
+            return text, input_tok, output_tok
+
+        else:
+            raise ValueError(f"Provider desconhecido: {provider}")
+
+    def get_session_summary(self) -> dict:
+        return self.tracker.get_summary()
