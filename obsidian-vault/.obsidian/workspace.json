@@ -11,10 +11,14 @@
             "id": "5bcea104145e58fd",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "05-session-reports/progress/2026-05-01_5a609ce2_progress.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "Nova aba"
+              "title": "2026-05-01_5a609ce2_progress"
             }
           }
         ]
@@ -179,9 +183,9 @@
   },
   "active": "5bcea104145e58fd",
   "lastOpenFiles": [
-    "05-session-reports/progress/2026-05-01_5a609ce2_progress.md",
     "05-session-reports/costs/2026-05-01_5a609ce2_cost.md",
     "05-session-memory/vocabulary-learned.md",
+    "05-session-reports/progress/2026-05-01_5a609ce2_progress.md",
     "05-session-reports/progress",
     "05-session-reports/costs",
     "05-session-reports",
