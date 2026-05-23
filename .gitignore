@@ -13,8 +13,11 @@ wheels/
 # Variáveis de ambiente
 .env
 
-# Banco vetorial (gerado localmente)
+# Banco vetorial e modelos (gerados localmente)
 chroma_db/
+rag/chroma_db/
+rag/model_cache/
+rag/graph_data/
 
 # PDFs dos livros (direitos autorais)
 data/

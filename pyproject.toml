@@ -3,11 +3,12 @@ name = "starter-english-teacher-agent"
 version = "0.1.0"
 description = "Agente professor de inglês com RAG usando o livro Starter da SOS English"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.13"
 dependencies = [
     "chromadb>=1.5.5",
     "langchain>=1.2.13",
     "langchain-community>=0.4.1",
+    "langchain-groq>=1.1.2",
     "ollama>=0.6.1",
     "pdf2image>=1.17.0",
     "pillow>=12.1.1",
@@ -17,6 +18,14 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "sentence-transformers>=5.3.0",
     "streamlit>=1.55.0",
+    "groq>=0.5.0",
+    "openai>=1.30.0",
+    "anthropic>=0.34.0",
+    "llama-index>=0.14.22",
+    "llama-index-vector-stores-chroma>=0.5.5",
+    "llama-index-readers-file>=0.6.0",
+    "llama-index-embeddings-huggingface>=0.7.0",
+    "tiktoken>=0.13.0",
 ]
 
 [tool.uv]
