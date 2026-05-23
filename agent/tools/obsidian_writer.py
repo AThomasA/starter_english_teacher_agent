@@ -59,6 +59,20 @@ def read_all_files_in_folder(relative_folder: str) -> str:
     return "\n\n---\n\n".join(contents)
 
 
+def load_student_context() -> str:
+    """Carrega perfil e avaliação de nível do aluno."""
+    parts = []
+    for f in [
+        "05-session-memory/allan-profile.md",
+        "05-session-memory/level-assessment.md",
+        "05-session-memory/student-profile.md",
+    ]:
+        content = read_file(f)
+        if content:
+            parts.append(f"## [{Path(f).stem}]\n{content}")
+    return "\n\n---\n\n".join(parts)
+
+
 def load_bianca_context() -> str:
     """
     Carrega todo o contexto da Bianca (personalidade + currículo + métricas).
@@ -71,6 +85,10 @@ def load_bianca_context() -> str:
         content = read_all_files_in_folder(folder)
         if content:
             context_parts.append(content)
+
+    student_ctx = load_student_context()
+    if student_ctx:
+        context_parts.append(student_ctx)
 
     return "\n\n===\n\n".join(context_parts)
 
